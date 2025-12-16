@@ -24,6 +24,7 @@ n <- 60
 T <- 1
 
 # Obtaining Price Data and Calculating Returns
+
 # Stock tickers vector
 tickers <- c("NVDA", "AMD")
 
@@ -80,6 +81,8 @@ returns_long_date <- returns_monthly %>%
     values_to = "monthly_return"
   )
 
+returns_long_date <- head(returns_long_date, 60)
+
 stock_colours <- c("AMD" = "#1F968BFF", "NVDA" = "#404788FF")
 
 # Creating a plot of the monthly returns
@@ -97,7 +100,6 @@ returns_plot <- ggplot(returns_long_date) +
 # scale_color_brewer(palette = "Set1")
 
 ggsave("returns.png", plot = returns_plot, width = 7, height = 4)
-```
 
 # Obtaining Risk-Free Rate Data
 
@@ -121,7 +123,6 @@ N_rho <- 20 # even number
 N_time <- 100
 price_range <- 0.6 # %
 price_dif <- 0.01 # %
-vol_range <- 0.3 # %
 vol_dif <- 0.01 # %
 
 # Drawing independent random normal values
@@ -152,9 +153,6 @@ price_incremements <- seq(-price_range, price_range, price_dif)
 
 # Partitioning the option duration (time to maturity)
 time_partition <- seq(0, 1 + (1 / N_time), 1 / N_time)
-
-# Creating increments of the volatility of returns
-volatility_increments <- seq(-vol_range, vol_range, vol_dif)
 
 # Defining the payoff function at maturity
 payoff <- function(x){
@@ -740,7 +738,7 @@ for (rho in rho_partition){
   AMD_path <- exp((rf - (AMD_vol + vol_dif)^2 / 2) * T + (AMD_vol + vol_dif) * W_AMD_T)
   
   # Iterating over initial asset prices
-  for (percentage_change in volatility_increments){
+  for (percentage_change in price_increments){
     # Calculating initial asset prices
     basket_0 <- (NVDA_0 * (1 + percentage_change) + AMD_0 * (1 + percentage_change)) / 2
     
@@ -786,7 +784,7 @@ for (rho in rho_partition){
   AMD_path <- exp((rf - (AMD_vol - vol_dif)^2 / 2) * T + (AMD_vol - vol_dif) * W_AMD_T)
   
   # Iterating over initial asset prices
-  for (percentage_change in volatility_increments){
+  for (percentage_change in price_increments){
     # Calculating initial asset prices
     basket_0 <- (NVDA_0 * (1 + percentage_change) + AMD_0 * (1 + percentage_change)) / 2
     
@@ -869,7 +867,7 @@ for (rho in rho_partition){
   AMD_path <- exp((rf - (AMD_vol + vol_dif)^2 / 2) * T + (AMD_vol + vol_dif) * W_AMD_T)
   
   # Iterating over initial asset prices
-  for (percentage_change in volatility_increments){
+  for (percentage_change in price_incremements){
     # Calculating initial asset prices
     spread_0 <- AMD_0 * (1 + percentage_change) - NVDA_0 * (1 - percentage_change)
     
@@ -915,7 +913,7 @@ for (rho in rho_partition){
   AMD_path <- exp((rf - (AMD_vol - vol_dif)^2 / 2) * T + (AMD_vol - vol_dif) * W_AMD_T)
   
   # Iterating over initial asset prices
-  for (percentage_change in volatility_increments){
+  for (percentage_change in price_increments){
     # Calculating initial asset prices
     spread_0 <- AMD_0 * (1 + percentage_change) - NVDA_0 * (1 - percentage_change)
     
@@ -1047,10 +1045,3 @@ s_put_vega_plot <- s_put_vega_plot %>% layout(scene = list(
     eye = list(x = -0.4, y = 2.3, z = 0.7))))
 
 s_put_vega_plot
-
-
-
-
-
-
-
