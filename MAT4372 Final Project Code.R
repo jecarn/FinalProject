@@ -81,8 +81,6 @@ returns_long_date <- returns_monthly %>%
     values_to = "monthly_return"
   )
 
-returns_long_date <- head(returns_long_date, 60)
-
 stock_colours <- c("AMD" = "#1F968BFF", "NVDA" = "#404788FF")
 
 # Creating a plot of the monthly returns
@@ -97,9 +95,9 @@ returns_plot <- ggplot(returns_long_date) +
     color = "Stock"
   ) +
   scale_color_manual(values = stock_colours)
-# scale_color_brewer(palette = "Set1")
 
-ggsave("returns.png", plot = returns_plot, width = 7, height = 4)
+# Saving the plot
+# ggsave("returns.png", plot = returns_plot, width = 7, height = 4)
 
 # Obtaining Risk-Free Rate Data
 
@@ -123,6 +121,7 @@ N_rho <- 20 # even number
 N_time <- 100
 price_range <- 0.6 # %
 price_dif <- 0.01 # %
+vol_range <- 0.3 # %
 vol_dif <- 0.01 # %
 
 # Drawing independent random normal values
@@ -153,6 +152,9 @@ price_incremements <- seq(-price_range, price_range, price_dif)
 
 # Partitioning the option duration (time to maturity)
 time_partition <- seq(0, 1 + (1 / N_time), 1 / N_time)
+
+# Creating increments of the volatility of returns
+volatility_increments <- seq(-vol_range, vol_range, vol_dif)
 
 # Defining the payoff function at maturity
 payoff <- function(x){
@@ -326,6 +328,7 @@ for (rho in rho_partition){
 }
 
 # Basket Call Price Plot (Price)
+
 b_call_price_plot <- surface_3d_plot(
   df_basket_delta_gamma,
   "b_0_vec", "b_rho_vec", "b_call_vec",
@@ -339,6 +342,7 @@ b_call_price_plot <- b_call_price_plot %>% layout(scene = list(
 b_call_price_plot
 
 # Basket Put Price Plot (Price)
+
 b_put_price_plot <- surface_3d_plot(
   df_basket_delta_gamma,
   "b_0_vec", "b_rho_vec", "b_put_vec",
@@ -353,10 +357,11 @@ b_put_price_plot <- b_put_price_plot %>% layout(scene = list(
 b_put_price_plot
 
 # Basket Call Delta Plot
+
 b_call_delta_plot <- surface_3d_plot(
   df_basket_delta_gamma,
   "b_0_vec", "b_rho_vec", "b_call_delta",
-  "Initial Basket Price", "Correlation (ρ)", "Delta (Δ)")
+  "Initial Basket Price", "Correlation (ρ)", "Basket Call Delta (Δ)")
 
 b_call_delta_plot <- b_call_delta_plot %>% layout(scene = list(
   yaxis = list(autorange = "reversed"),
@@ -366,10 +371,11 @@ b_call_delta_plot <- b_call_delta_plot %>% layout(scene = list(
 b_call_delta_plot
 
 # Basket Put Delta Plot
+
 b_put_delta_plot <- surface_3d_plot(
   df_basket_delta_gamma,
   "b_0_vec", "b_rho_vec", "b_put_delta",
-  "Initial Basket Price", "Correlation (ρ)", "Delta (Δ)")
+  "Initial Basket Price", "Correlation (ρ)", "Basket Put Delta (Δ)")
 
 b_put_delta_plot <- b_put_delta_plot %>% layout(scene = list(
   yaxis = list(range = c(1, -1.1)),
@@ -379,10 +385,11 @@ b_put_delta_plot <- b_put_delta_plot %>% layout(scene = list(
 b_put_delta_plot
 
 # Basket Call Gamma Plot
+
 b_call_gamma_plot <- surface_3d_plot(
   df_basket_delta_gamma[!is.na(df_basket_delta_gamma$b_call_gamma),],
   "b_0_vec", "b_rho_vec", "b_call_gamma",
-  "Initial Basket Price", "Correlation (ρ)", "Gamma (Γ)")
+  "Initial Basket Price", "Correlation (ρ)", "Basket Call Gamma (Γ)")
 
 b_call_gamma_plot <- b_call_gamma_plot %>% layout(scene = list(
   yaxis = list(autorange = "reversed"),
@@ -392,10 +399,11 @@ b_call_gamma_plot <- b_call_gamma_plot %>% layout(scene = list(
 b_call_gamma_plot
 
 # Basket Put Gamma Plot
+
 b_put_gamma_plot <- surface_3d_plot(
   df_basket_delta_gamma[!is.na(df_basket_delta_gamma$b_call_gamma),],
   "b_0_vec", "b_rho_vec", "b_put_gamma",
-  "Initial Basket Price", "Correlation (ρ)", "Gamma (Γ)")
+  "Initial Basket Price", "Correlation (ρ)", "Basket Put Gamma (Γ)")
 
 b_put_gamma_plot <- b_put_gamma_plot %>% layout(scene = list(
   xaxis = list(range = c(98, 310)),
@@ -406,6 +414,7 @@ b_put_gamma_plot <- b_put_gamma_plot %>% layout(scene = list(
 b_put_gamma_plot
 
 # Spread Call Price Plot (Price)
+
 s_call_price_plot <- surface_3d_plot(
   df_spread_delta_gamma,
   "s_0_vec", "s_rho_vec", "s_call_vec",
@@ -419,6 +428,7 @@ s_call_price_plot <- s_call_price_plot %>% layout(scene = list(
 s_call_price_plot
 
 # Spread Put Price Plot (Price)
+
 s_put_price_plot <- surface_3d_plot(
   df_spread_delta_gamma,
   "s_0_vec", "s_rho_vec", "s_put_vec",
@@ -433,10 +443,11 @@ s_put_price_plot <- s_put_price_plot %>% layout(scene = list(
 s_put_price_plot
 
 # Spread Call Delta Plot
+
 s_call_delta_plot <- surface_3d_plot(
   df_spread_delta_gamma,
   "s_0_vec", "s_rho_vec", "s_call_delta",
-  "Initial Spread Price", "Correlation (ρ)", "Delta (Δ)")
+  "Initial Spread Price", "Correlation (ρ)", "Spread Call Delta (Δ)")
 
 s_call_delta_plot <- s_call_delta_plot %>% layout(scene = list(
   yaxis = list(autorange = "reversed"),
@@ -446,10 +457,11 @@ s_call_delta_plot <- s_call_delta_plot %>% layout(scene = list(
 s_call_delta_plot
 
 # Spread Put Delta Plot
+
 s_put_delta_plot <- surface_3d_plot(
   df_spread_delta_gamma,
   "s_0_vec", "s_rho_vec", "s_put_delta",
-  "Initial Spread Price", "Correlation (ρ)", "Delta (Δ)")
+  "Initial Spread Price", "Correlation (ρ)", "Spread Put Delta (Δ)")
 
 s_put_delta_plot <- s_put_delta_plot %>% layout(scene = list(
   yaxis = list(autorange = "reversed"),
@@ -459,10 +471,11 @@ s_put_delta_plot <- s_put_delta_plot %>% layout(scene = list(
 s_put_delta_plot
 
 # Spread Call Gamma Plot
+
 s_call_gamma_plot <- surface_3d_plot(
   df_spread_delta_gamma[!is.na(df_spread_delta_gamma$s_call_gamma),],
   "s_0_vec", "s_rho_vec", "s_call_gamma",
-  "Initial Spread Price", "Correlation (ρ)", "Gamma (Γ)")
+  "Initial Spread Price", "Correlation (ρ)", "Spread Call Gamma (Γ)")
 
 s_call_gamma_plot <- s_call_gamma_plot %>% layout(scene = list(
   xaxis = list(range = c(-157, 240)),
@@ -473,10 +486,11 @@ s_call_gamma_plot <- s_call_gamma_plot %>% layout(scene = list(
 s_call_gamma_plot
 
 # Spread Put Gamma Plot
+
 s_put_gamma_plot <- surface_3d_plot(
   df_spread_delta_gamma[!is.na(df_spread_delta_gamma$s_put_gamma),],
   "s_0_vec", "s_rho_vec", "s_put_gamma",
-  "Initial Spread Price", "Correlation (ρ)", "Gamma (Γ)")
+  "Initial Spread Price", "Correlation (ρ)", "Spread Put Gamma (Γ)")
 
 s_put_gamma_plot <- s_put_gamma_plot %>% layout(scene = list(
   xaxis = list(range = c(-165, 240)),
@@ -610,6 +624,7 @@ for (rho in rho_partition){
 }
 
 # Basket Call Price Plot (Time)
+
 b_call_price_time_plot <- surface_3d_plot(
   df_basket_theta,
   "b_time_vec", "b_rho_vec", "b_call_vec",
@@ -623,6 +638,7 @@ b_call_price_time_plot <- b_call_price_time_plot %>% layout(scene = list(
 b_call_price_time_plot
 
 # Basket Put Price Plot (Time)
+
 b_put_price_time_plot <- surface_3d_plot(
   df_basket_theta,
   "b_time_vec", "b_rho_vec", "b_put_vec",
@@ -636,32 +652,35 @@ b_put_price_time_plot <- b_put_price_time_plot %>% layout(scene = list(
 b_put_price_time_plot
 
 # Basket Call Theta Plot (Time)
+
 b_call_theta_plot <- surface_3d_plot(
   df_basket_theta,
   "b_time_vec", "b_rho_vec", "b_call_theta",
-  "Time to Maturity (years)", "Correlation (ρ)", "Theta (Θ)")
+  "Time to Maturity (years)", "Correlation (ρ)", "Basket Call Theta (Θ)")
 
 b_call_theta_plot <- b_call_theta_plot %>% layout(scene = list(
-  zaxis = list(range = c(-95, -5)),
+  zaxis = list(range = c(-150, -5)),
   camera = list(
     eye = list(x = -1, y = 2.3, z = 0.5))))
 
 b_call_theta_plot
 
 # Basket Put Theta Plot (Time)
+
 b_put_theta_plot <- surface_3d_plot(
   df_basket_theta,
   "b_time_vec", "b_rho_vec", "b_put_theta",
-  "Time to Maturity (years)", "Correlation (ρ)", "Theta (Θ)")
+  "Time to Maturity (years)", "Correlation (ρ)", "Basket Put Theta (Θ)")
 
 b_put_theta_plot <- b_put_theta_plot %>% layout(scene = list(
-  zaxis = list(range = c(-95, -5)),
+  zaxis = list(range = c(-150, -5)),
   camera = list(
     eye = list(x = -1, y = 2.3, z = 0.5))))
 
 b_put_theta_plot
 
 # Spread Call Price Plot (Time)
+
 s_call_price_time_plot <- surface_3d_plot(
   df_spread_theta,
   "s_time_vec", "s_rho_vec", "s_call_vec",
@@ -676,6 +695,7 @@ s_call_price_time_plot <- s_call_price_time_plot %>% layout(scene = list(
 s_call_price_time_plot
 
 # Spread Put Price Plot (Time)
+
 s_put_price_time_plot <- surface_3d_plot(
   df_spread_theta,
   "s_time_vec", "s_rho_vec", "s_put_vec",
@@ -690,28 +710,30 @@ s_put_price_time_plot <- s_put_price_time_plot %>% layout(scene = list(
 s_put_price_time_plot
 
 # Spread Call Theta Plot (Time)
+
 s_call_theta_plot <- surface_3d_plot(
   df_spread_theta,
   "s_time_vec", "s_rho_vec", "s_call_theta",
-  "Time to Maturity (years)", "Correlation (ρ)", "Theta (Θ)")
+  "Time to Maturity (years)", "Correlation (ρ)", "Spread Call Theta (Θ)")
 
 s_call_theta_plot <- s_call_theta_plot %>% layout(scene = list(
   yaxis = list(autorange = "reversed"),
-  zaxis = list(range = c(-95, 0)),
+  zaxis = list(range = c(-150, -1)),
   camera = list(
     eye = list(x = -1, y = 2.3, z = 0.5))))
 
 s_call_theta_plot
 
 # Spread Put Theta Plot (Time)
+
 s_put_theta_plot <- surface_3d_plot(
   df_spread_theta,
   "s_time_vec", "s_rho_vec", "s_put_theta",
-  "Time to Maturity (years)", "Correlation (ρ)", "Theta (Θ)")
+  "Time to Maturity (years)", "Correlation (ρ)", "Spread Put Theta (Θ)")
 
 s_put_theta_plot <- s_put_theta_plot %>% layout(scene = list(
   yaxis = list(autorange = "reversed"),
-  zaxis = list(range = c(-95, 0)),
+  zaxis = list(range = c(-150, -1)),
   camera = list(
     eye = list(x = -1, y = 2.3, z = 0.5))))
 
@@ -738,7 +760,7 @@ for (rho in rho_partition){
   AMD_path <- exp((rf - (AMD_vol + vol_dif)^2 / 2) * T + (AMD_vol + vol_dif) * W_AMD_T)
   
   # Iterating over initial asset prices
-  for (percentage_change in price_increments){
+  for (percentage_change in price_incremements){
     # Calculating initial asset prices
     basket_0 <- (NVDA_0 * (1 + percentage_change) + AMD_0 * (1 + percentage_change)) / 2
     
@@ -784,7 +806,7 @@ for (rho in rho_partition){
   AMD_path <- exp((rf - (AMD_vol - vol_dif)^2 / 2) * T + (AMD_vol - vol_dif) * W_AMD_T)
   
   # Iterating over initial asset prices
-  for (percentage_change in price_increments){
+  for (percentage_change in price_incremements){
     # Calculating initial asset prices
     basket_0 <- (NVDA_0 * (1 + percentage_change) + AMD_0 * (1 + percentage_change)) / 2
     
@@ -913,7 +935,7 @@ for (rho in rho_partition){
   AMD_path <- exp((rf - (AMD_vol - vol_dif)^2 / 2) * T + (AMD_vol - vol_dif) * W_AMD_T)
   
   # Iterating over initial asset prices
-  for (percentage_change in price_increments){
+  for (percentage_change in price_incremements){
     # Calculating initial asset prices
     spread_0 <- AMD_0 * (1 + percentage_change) - NVDA_0 * (1 - percentage_change)
     
@@ -993,10 +1015,11 @@ df_spread_vega <- df_spread_vega %>%
   )
 
 # Basket Call Vega Plot
+
 b_call_vega_plot <- surface_3d_plot(
   df_basket_vega,
   "b_0_vec", "b_rho_vec", "b_call_vega",
-  "Initial Basket Price", "Correlation (ρ)", "Vega (ν)")
+  "Initial Basket Price", "Correlation (ρ)", "Basket Call Vega (ν)")
 
 b_call_vega_plot <- b_call_vega_plot %>% layout(scene = list(
   xaxis = list(autorange = "reversed"),
@@ -1007,10 +1030,11 @@ b_call_vega_plot <- b_call_vega_plot %>% layout(scene = list(
 b_call_vega_plot
 
 # Basket Put Vega Plot
+
 b_put_vega_plot <- surface_3d_plot(
   df_basket_vega,
   "b_0_vec", "b_rho_vec", "b_put_vega",
-  "Initial Basket Price", "Correlation (ρ)", "Vega (ν)")
+  "Initial Basket Price", "Correlation (ρ)", "Basket Put Vega (ν)")
 
 b_put_vega_plot <- b_put_vega_plot %>% layout(scene = list(
   xaxis = list(autorange = "reversed"),
@@ -1021,10 +1045,11 @@ b_put_vega_plot <- b_put_vega_plot %>% layout(scene = list(
 b_put_vega_plot
 
 # Spread Call Vega Plot
+
 s_call_vega_plot <- surface_3d_plot(
   df_spread_vega,
   "s_0_vec", "s_rho_vec", "s_call_vega",
-  "Initial Spread Price", "Correlation (ρ)", "Vega (ν)")
+  "Initial Spread Price", "Correlation (ρ)", "Spread Call Vega (ν)")
 
 s_call_vega_plot <- s_call_vega_plot %>% layout(scene = list(
   xaxis = list(autorange = "reversed"),
@@ -1034,10 +1059,11 @@ s_call_vega_plot <- s_call_vega_plot %>% layout(scene = list(
 s_call_vega_plot
 
 # Spread Put Vega Plot
+
 s_put_vega_plot <- surface_3d_plot(
   df_spread_vega,
   "s_0_vec", "s_rho_vec", "s_put_vega",
-  "Initial Spread Price", "Correlation (ρ)", "Vega (ν)")
+  "Initial Spread Price", "Correlation (ρ)", "Spread Put Vega (ν)")
 
 s_put_vega_plot <- s_put_vega_plot %>% layout(scene = list(
   xaxis = list(autorange = "reversed"),
